@@ -29,9 +29,7 @@ public class UserController {
     @Autowired
     private ValidationService validationService;
 
-    // ─────────────────────────────────────────────
     // GET /users?sortedBy=&filter=
-    // ─────────────────────────────────────────────
     @GetMapping
     public List<User> getAllUsers(
             @RequestParam(required = false) String sortedBy,
@@ -82,9 +80,7 @@ public class UserController {
         return userList;
     }
 
-    // ─────────────────────────────────────────────
     // POST /users — Agregar nuevo usuario
-    // ─────────────────────────────────────────────
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody User newUser) {
 
@@ -94,27 +90,27 @@ public class UserController {
             newUser.getTax_id()   == null || newUser.getTax_id().isBlank() ||
             newUser.getPassword() == null || newUser.getPassword().isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Fields name, email, tax_id and password are required.");
+                    .body("Fields name, email, tax_id y password son obligatorios.");
         }
 
         // Validar formato RFC
         if (!validationService.isValidRfc(newUser.getTax_id())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Invalid tax_id: must follow RFC format (e.g. AARR990101XXX).");
+                    .body("tax_id inválido: debe seguir un formato RFC (e.g. AARR990101XXX).");
         }
 
-        // Validar phone — AndresFormat (solo si viene en el request)
+        // Validar phone — AndresFormat
         if (newUser.getPhone() != null && !newUser.getPhone().isBlank()) {
             if (!validationService.isValidPhone(newUser.getPhone())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Invalid phone (AndresFormat): 10 local digits required, country code optional (e.g. +52 555 123 4567).");
+                        .body("phone inválido (AndresFormat): 10 digitos necesarios, código de páis opcional (e.g. +52 555 123 4567).");
             }
         }
 
         // tax_id único
         if (userRepository.findByTaxId(newUser.getTax_id()) != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("A user with that tax_id already exists.");
+                    .body("Usuario con ese tax_id ya existe.");
         }
 
         // Asignar UUID automático
@@ -130,9 +126,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 
-    // ─────────────────────────────────────────────
     // PATCH /users/{id} — Actualizar atributos por ID
-    // ─────────────────────────────────────────────
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateUser(
             @PathVariable UUID id,
@@ -141,7 +135,7 @@ public class UserController {
         User user = userRepository.findById(id);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("User not found with id: " + id);
+                    .body("Usuario con id: " + id + " no encontrado.");
         }
 
         // Validar tax_id si viene en el body
@@ -149,12 +143,12 @@ public class UserController {
             String newTaxId = (String) fields.get("tax_id");
             if (!validationService.isValidRfc(newTaxId)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Invalid tax_id: must follow RFC format.");
+                        .body("tax_id inválido: debe seguir un formato de RFC.");
             }
             if (!newTaxId.equalsIgnoreCase(user.getTax_id()) &&
                 userRepository.findByTaxId(newTaxId) != null) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("A user with that tax_id already exists.");
+                        .body("Usuario con ese tax_id ya existe.");
             }
         }
 
@@ -163,7 +157,7 @@ public class UserController {
             String newPhone = (String) fields.get("phone");
             if (!validationService.isValidPhone(newPhone)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Invalid phone (AndresFormat): 10 local digits required, country code optional.");
+                        .body("phone inválido (AndresFormat): 10 digitos necesarios, código de páis opcional (e.g. +52 555 123 4567).");
             }
         }
 
@@ -181,16 +175,14 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    // ─────────────────────────────────────────────
     // DELETE /users/{id} — Eliminar usuario por ID
-    // ─────────────────────────────────────────────
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable UUID id) {
         boolean removed = userRepository.deleteById(id);
         if (!removed) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("User not found with id: " + id);
+                    .body("Usuario con id: " + id + " no encontrado.");
         }
-        return ResponseEntity.ok("User deleted successfully.");
+        return ResponseEntity.ok("Usuario eliminado exitosamente.");
     }
 }

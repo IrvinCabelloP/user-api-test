@@ -10,7 +10,6 @@ import java.util.Base64;
 public class EncryptionService {
 
     // Clave de 32 bytes = 256 bits (AES-256)
-    // En producción esto debe venir de variables de entorno
     private static final String SECRET_KEY = "MySecretKey12345MySecretKey12345";
 
     /**

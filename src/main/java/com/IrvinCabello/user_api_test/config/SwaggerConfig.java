@@ -15,9 +15,9 @@ public class SwaggerConfig {
                 .info(new Info()
                         .title("User API")
                         .version("1.0.0")
-                        .description("REST API para gestión de usuarios — Prueba Técnica Chakray Consulting")
+                        .description("Prueba Técnica - REST API")
                         .contact(new Contact()
                                 .name("Irvin Cabello")
-                                .email("irvin@mail.com")));
+                                .email("davidcp481@mail.com")));
     }
 }

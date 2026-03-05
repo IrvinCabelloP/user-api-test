@@ -18,7 +18,7 @@ public class LoginController {
     private UserRepository userRepository;
 
     @Autowired
-    private EncryptionService encryptionService;  // ← nuevo
+    private EncryptionService encryptionService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
@@ -30,7 +30,7 @@ public class LoginController {
                     .body("Invalid credentials");
         }
 
-        // ↓ Compara encriptando el password recibido y comparando con el almacenado
+        // Comparación de el password recibido y comparando con el almacenado
         if (!encryptionService.matches(loginRequest.getPassword(), user.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Invalid credentials");
